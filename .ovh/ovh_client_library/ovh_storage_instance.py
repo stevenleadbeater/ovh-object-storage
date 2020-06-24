@@ -20,3 +20,8 @@ def make_instance_private(project_id, storage_id):
     client = ovh.Client()
     client.put('/cloud/project/{}/storage/{}'.format(project_id, storage_id), containerType='private')
 
+
+def make_instance_static(project_id, storage_id):
+    client = ovh.Client()
+    client.put('/cloud/project/{}/storage/{}'.format(project_id, storage_id), containerType='static')
+
