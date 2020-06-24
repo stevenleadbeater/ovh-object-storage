@@ -14,13 +14,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Checkout submodules using a PAT
-      run: |
-        git config --file .gitmodules --get-regexp url | while read url; do
-          git config --file=.gitmodules $(echo "$url" | sed -E "s/git@github.com:|https:\/\/github.com\//https:\/\/${{ secrets.CI_PERSONAL_ACCESS_TOKEN }}:${{ secrets.CI_PERSONAL_ACCESS_TOKEN }}@github.com\//")
-        done
-        git submodule sync
-        git submodule update --init --recursive
     - name: Install dependencies
       run: |
         if [ -f .ovh/requirements.txt ]; then pip3 install -r .ovh/requirements.txt; fi
@@ -33,19 +26,5 @@ jobs:
     - name: Deploy Object Storage
       run: |
         cd .ovh
-        OVH_ENDPOINT=ovh-eu OVH_APPLICATION_KEY=${{ secrets.OVH_APPLICATION_KEY }} OVH_APPLICATION_SECRET=${{ secrets.OVH_APPLICATION_SECRET }} OVH_CONSUMER_KEY=${{ secrets.OVH_CONSUMER_KEY }} python3 create_environment.py albeego-object-storage-1
-    - name: Slack Notify
-      uses: rtCamp/action-slack-notify@v2.0.2
-      if: failure()
-      env:
-       SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-       SLACK_MESSAGE: 'The object storage build failed.'
-       SLACK_COLOR: '#FF0000'
-    - name: Slack Notify
-      uses: rtCamp/action-slack-notify@v2.0.2
-      if: success()
-      env:
-       SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-       SLACK_MESSAGE: 'The object storage build passed.'
-       SLACK_COLOR: '#00FF00'
+        OVH_ENDPOINT=ovh-eu OVH_APPLICATION_KEY=${{ secrets.OVH_APPLICATION_KEY }} OVH_APPLICATION_SECRET=${{ secrets.OVH_APPLICATION_SECRET }} OVH_CONSUMER_KEY=${{ secrets.OVH_CONSUMER_KEY }} python3 create_environment.py object-storage-1
 
